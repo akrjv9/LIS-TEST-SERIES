@@ -14,8 +14,14 @@ export const generateStudyGuide = async (topic: string): Promise<StudyGuide> => 
   const prompt = `You are an expert Library and Information Science tutor representing 'LIST Test Series'. 
   Write a comprehensive study guide/summary about "${topic}".
   
-  Structure the content with clear headings (##), bullet points, and concise paragraphs. 
-  Focus on definitions, key concepts, important figures, and years/dates relevant to LIS competitive exams.
+  Structure the content with clear headings, bullet points, and concise paragraphs.
+  Do not use Markdown '#', '##' styles for headers. Instead, use capitalized text or spacing to denote sections so it looks good in plain text.
+  
+  Focus on:
+  - Key definitions
+  - Important figures and authors
+  - Critical years/dates
+  - Relevance to LIS competitive exams (UGC NET/SET)
   
   Use the Google Search results to provide accurate information, prioritizing content from listestseries.wordpress.com if available.`;
 

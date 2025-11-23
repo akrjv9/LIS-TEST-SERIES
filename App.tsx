@@ -3,9 +3,10 @@ import Header from './components/Layout/Header';
 import TopicSelector from './components/Home/TopicSelector';
 import QuizRunner from './components/Quiz/QuizRunner';
 import ResultsView from './components/Quiz/ResultsView';
+import StudyView from './components/Study/StudyView';
 import Loader from './components/Layout/Loader';
-import { AppView, Question, QuizConfig } from './types';
-import { generateQuizQuestions } from './services/geminiService';
+import { AppView, Question, QuizConfig, StudyGuide } from './types';
+import { generateQuizQuestions, generateStudyGuide } from './services/geminiService';
 import { AlertTriangle } from 'lucide-react';
 
 const App: React.FC = () => {
@@ -13,10 +14,13 @@ const App: React.FC = () => {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentConfig, setCurrentConfig] = useState<QuizConfig | null>(null);
   const [userAnswers, setUserAnswers] = useState<number[]>([]);
+  const [studyGuide, setStudyGuide] = useState<StudyGuide | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [loadingMessage, setLoadingMessage] = useState<string>('');
 
   const startQuiz = async (config: QuizConfig) => {
     setView(AppView.LOADING);
+    setLoadingMessage(`Generating ${config.difficulty} ${config.topic} Questions...`);
     setCurrentConfig(config);
     setError(null);
     try {
@@ -26,6 +30,21 @@ const App: React.FC = () => {
     } catch (err: any) {
       console.error(err);
       setError("Failed to generate quiz questions. Please check your connection or try a different topic.");
+      setView(AppView.ERROR);
+    }
+  };
+
+  const handleStudySearch = async (topic: string) => {
+    setView(AppView.LOADING);
+    setLoadingMessage(`Compiling Study Guide for "${topic}"...`);
+    setError(null);
+    try {
+      const guide = await generateStudyGuide(topic);
+      setStudyGuide(guide);
+      setView(AppView.STUDY);
+    } catch (err: any) {
+      console.error(err);
+      setError("Failed to generate study guide. Please try a different topic or check your internet connection.");
       setView(AppView.ERROR);
     }
   };
@@ -40,6 +59,7 @@ const App: React.FC = () => {
     setQuestions([]);
     setCurrentConfig(null);
     setUserAnswers([]);
+    setStudyGuide(null);
     setError(null);
   };
 
@@ -49,11 +69,14 @@ const App: React.FC = () => {
 
       <main className="flex-grow">
         {view === AppView.HOME && (
-          <TopicSelector onStartQuiz={startQuiz} />
+          <TopicSelector 
+            onStartQuiz={startQuiz} 
+            onSearchTopic={handleStudySearch}
+          />
         )}
 
         {view === AppView.LOADING && (
-          <Loader message={`Generating ${currentConfig?.difficulty} ${currentConfig?.topic} Questions...`} />
+          <Loader message={loadingMessage} />
         )}
 
         {view === AppView.QUIZ && currentConfig && (
@@ -71,6 +94,13 @@ const App: React.FC = () => {
             topic={currentConfig?.topic || 'Library Science'}
             onRetry={resetApp}
             onHome={resetApp}
+          />
+        )}
+
+        {view === AppView.STUDY && studyGuide && (
+          <StudyView 
+            guide={studyGuide}
+            onBack={resetApp}
           />
         )}
 
@@ -93,7 +123,7 @@ const App: React.FC = () => {
 
       <footer className="bg-white border-t border-slate-200 py-8 print:hidden">
         <div className="container mx-auto px-4 text-center text-slate-500 text-sm">
-          <p>© {new Date().getFullYear()} LibSci Master. Built for Library Professionals.</p>
+          <p>© {new Date().getFullYear()} LIST Test Series. Built for Library Professionals.</p>
         </div>
       </footer>
     </div>
