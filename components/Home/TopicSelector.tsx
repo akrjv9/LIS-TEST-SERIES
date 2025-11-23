@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import { PREDEFINED_TOPICS, ICONS } from '../../constants';
 import { QuizConfig } from '../../types';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, BookOpenCheck, Search } from 'lucide-react';
 
 interface TopicSelectorProps {
   onStartQuiz: (config: QuizConfig) => void;
+  onSearchTopic: (topic: string) => void;
 }
 
-const TopicSelector: React.FC<TopicSelectorProps> = ({ onStartQuiz }) => {
+const TopicSelector: React.FC<TopicSelectorProps> = ({ onStartQuiz, onSearchTopic }) => {
   const [customTopic, setCustomTopic] = useState('');
+  const [studyTopic, setStudyTopic] = useState('');
   const [difficulty, setDifficulty] = useState<QuizConfig['difficulty']>('Intermediate');
   const [questionCount, setQuestionCount] = useState<number>(10);
 
@@ -20,7 +22,7 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({ onStartQuiz }) => {
     });
   };
 
-  const handleCustomSubmit = (e: React.FormEvent) => {
+  const handleCustomQuizSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (customTopic.trim()) {
       onStartQuiz({
@@ -31,14 +33,22 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({ onStartQuiz }) => {
     }
   };
 
+  const handleStudySearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (studyTopic.trim()) {
+      onSearchTopic(studyTopic);
+    }
+  };
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-12">
       <div className="text-center mb-12">
         <h1 className="text-4xl md:text-5xl font-extrabold text-slate-900 mb-4">
-          Master Library Science
+          LIST Test Series
         </h1>
         <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-          Prepare for UGC NET, SET, and Librarian exams with AI-generated mock tests tailored to your specific needs.
+          Your trusted partner for Library and Information Science competitive exams (UGC NET, SET, Librarian). 
+          Practice with content curated from <strong>listestseries.wordpress.com</strong> and AI.
         </p>
       </div>
 
@@ -71,62 +81,86 @@ const TopicSelector: React.FC<TopicSelectorProps> = ({ onStartQuiz }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      {/* Topics Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16">
         {PREDEFINED_TOPICS.map((topic) => {
-          const Icon = ICONS[topic.icon];
+          const IconComponent = ICONS[topic.icon] || BookOpenCheck;
           return (
             <button
               key={topic.id}
               onClick={() => handlePresetClick(topic.name)}
-              className="group text-left bg-white hover:bg-lib-50 p-6 rounded-2xl border border-slate-200 hover:border-lib-300 transition-all duration-200 shadow-sm hover:shadow-md flex flex-col h-full"
+              className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-lib-300 transition-all text-left group flex flex-col h-full"
             >
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-lib-100 text-lib-700 rounded-xl group-hover:scale-110 transition-transform duration-200">
-                  <Icon size={24} />
-                </div>
-                <ArrowRight className="text-slate-300 group-hover:text-lib-500 opacity-0 group-hover:opacity-100 transition-all" size={20} />
+              <div className="bg-lib-50 w-12 h-12 rounded-lg flex items-center justify-center mb-4 group-hover:bg-lib-100 transition-colors">
+                <IconComponent className="text-lib-600" size={24} />
               </div>
-              <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-lib-800">
+              <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-lib-700 transition-colors">
                 {topic.name}
               </h3>
-              <p className="text-sm text-slate-500 leading-relaxed">
+              <p className="text-slate-500 text-sm mb-4 flex-grow">
                 {topic.description}
               </p>
+              <div className="flex items-center text-lib-600 font-medium text-sm mt-auto">
+                Start Quiz <ArrowRight size={16} className="ml-1 group-hover:translate-x-1 transition-transform" />
+              </div>
             </button>
           );
         })}
       </div>
 
-      {/* Custom Topic Generator */}
-      <div className="bg-gradient-to-r from-slate-800 to-slate-900 rounded-2xl p-8 text-white relative overflow-hidden">
-        <div className="absolute top-0 right-0 p-12 opacity-10">
-          <Sparkles size={120} />
-        </div>
-        <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
-          <div className="flex-1">
-            <h3 className="text-2xl font-bold mb-2 flex items-center gap-2">
-              <Sparkles className="text-yellow-400" size={24} />
-              Generate Custom Quiz
-            </h3>
-            <p className="text-slate-300">
-              Can't find your topic? Type anything from "Ranganathan's Laws" to "Web 3.0 in Libraries".
-            </p>
+      {/* Custom & Study Section */}
+      <div className="grid md:grid-cols-2 gap-8">
+        {/* Custom Quiz */}
+        <div className="bg-slate-900 rounded-2xl p-8 text-white relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-8 opacity-10">
+            <Sparkles size={100} />
           </div>
-          <form onSubmit={handleCustomSubmit} className="flex-1 w-full md:max-w-md flex gap-2">
-            <input
-              type="text"
-              value={customTopic}
-              onChange={(e) => setCustomTopic(e.target.value)}
-              placeholder="e.g., Copyright Laws in India..."
-              className="flex-1 bg-white/10 border border-white/20 text-white placeholder-slate-400 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-lib-400 focus:bg-white/20 transition-all"
-            />
-            <button 
-              type="submit"
-              disabled={!customTopic.trim()}
-              className="bg-lib-500 hover:bg-lib-400 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-6 py-3 rounded-xl transition-colors shadow-lg shadow-lib-900/20"
-            >
-              Start
-            </button>
+          <h3 className="text-xl font-bold mb-2 relative z-10">Custom Quiz</h3>
+          <p className="text-slate-400 mb-6 text-sm relative z-10">Enter any topic to generate a specialized test.</p>
+          <form onSubmit={handleCustomQuizSubmit} className="relative z-10">
+            <div className="flex gap-2">
+              <input 
+                type="text" 
+                placeholder="e.g. MARC 21 Tags..." 
+                value={customTopic}
+                onChange={(e) => setCustomTopic(e.target.value)}
+                className="flex-1 bg-white/10 border border-white/20 rounded-lg px-4 py-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-lib-400"
+              />
+              <button 
+                type="submit"
+                disabled={!customTopic.trim()}
+                className="bg-lib-500 hover:bg-lib-600 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+              >
+                Go
+              </button>
+            </div>
+          </form>
+        </div>
+
+        {/* Study Guide Search */}
+        <div className="bg-white rounded-2xl p-8 border border-slate-200 shadow-sm">
+           <h3 className="text-xl font-bold mb-2 text-slate-800">Study Guides</h3>
+           <p className="text-slate-500 mb-6 text-sm">Generate comprehensive notes from LIST Test Series.</p>
+           <form onSubmit={handleStudySearchSubmit}>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-3.5 text-slate-400" size={18} />
+                <input 
+                  type="text" 
+                  placeholder="Topic to study..." 
+                  value={studyTopic}
+                  onChange={(e) => setStudyTopic(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-10 pr-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-lib-500"
+                />
+              </div>
+              <button 
+                type="submit"
+                disabled={!studyTopic.trim()}
+                className="bg-slate-800 hover:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-3 rounded-lg font-semibold transition-colors"
+              >
+                Study
+              </button>
+            </div>
           </form>
         </div>
       </div>

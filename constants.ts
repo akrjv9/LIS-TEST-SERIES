@@ -12,6 +12,12 @@ import {
 
 export const PREDEFINED_TOPICS: Category[] = [
   {
+    id: 'srr-legacy',
+    name: 'Dr. S.R. Ranganathan',
+    description: 'Life, legacy, Five Laws, and contributions of the Father of Library Science in India.',
+    icon: 'Library'
+  },
+  {
     id: 'class-cat',
     name: 'Classification & Cataloging',
     description: 'DDC, UDC, AACR2, MARC21, and RDA standards.',

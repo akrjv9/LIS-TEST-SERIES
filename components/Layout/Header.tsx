@@ -1,5 +1,5 @@
 import React from 'react';
-import { BookOpen, Github } from 'lucide-react';
+import { BookOpen } from 'lucide-react';
 
 interface HeaderProps {
   onHomeClick: () => void;
@@ -17,7 +17,7 @@ const Header: React.FC<HeaderProps> = ({ onHomeClick }) => {
             <BookOpen size={24} />
           </div>
           <span className="text-xl font-bold text-slate-800 tracking-tight">
-            LibSci<span className="text-lib-600">Master</span>
+            LIST<span className="text-lib-600"> Test Series</span>
           </span>
         </div>
         

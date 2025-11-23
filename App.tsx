@@ -68,6 +68,7 @@ const App: React.FC = () => {
           <ResultsView 
             questions={questions} 
             userAnswers={userAnswers} 
+            topic={currentConfig?.topic || 'Library Science'}
             onRetry={resetApp}
             onHome={resetApp}
           />

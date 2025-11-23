@@ -10,6 +10,7 @@ export interface QuizConfig {
   topic: string;
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced';
   questionCount: number;
+  sourceText?: string; // Optional source text to generate questions from
 }
 
 export interface QuizState {
@@ -25,7 +26,8 @@ export enum AppView {
   LOADING = 'LOADING',
   QUIZ = 'QUIZ',
   RESULTS = 'RESULTS',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
+  STUDY = 'STUDY'
 }
 
 export interface Category {
@@ -33,4 +35,10 @@ export interface Category {
   name: string;
   description: string;
   icon: string;
+}
+
+export interface StudyGuide {
+  topic: string;
+  content: string;
+  sources: { uri: string; title: string }[];
 }

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Question } from '../../types';
 import { 
   CheckCircle, 
@@ -8,18 +8,23 @@ import {
   Award,
   BookOpen,
   AlertCircle,
-  Download
+  Download,
+  Share2,
+  Check
 } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 
 interface ResultsViewProps {
   questions: Question[];
   userAnswers: number[];
+  topic: string;
   onRetry: () => void;
   onHome: () => void;
 }
 
-const ResultsView: React.FC<ResultsViewProps> = ({ questions, userAnswers, onRetry, onHome }) => {
+const ResultsView: React.FC<ResultsViewProps> = ({ questions, userAnswers, topic, onRetry, onHome }) => {
+  const [isCopied, setIsCopied] = useState(false);
+
   const correctCount = userAnswers.reduce((acc, ans, idx) => {
     return ans === questions[idx].correctIndex ? acc + 1 : acc;
   }, 0);
@@ -35,6 +40,28 @@ const ResultsView: React.FC<ResultsViewProps> = ({ questions, userAnswers, onRet
 
   const handleDownload = () => {
     window.print();
+  };
+
+  const handleShare = async () => {
+    const text = `I scored ${scorePercentage}% on the ${topic} quiz! 🎯\nPractice Library Science MCQs at LIST Test Series.`;
+    const url = 'https://listestseries.wordpress.com/';
+    const shareData = {
+      title: 'LIST Test Series Result',
+      text: text,
+      url: url,
+    };
+
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${text}\n${url}`);
+        setIsCopied(true);
+        setTimeout(() => setIsCopied(false), 2000);
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
   };
 
   return (
@@ -192,7 +219,15 @@ const ResultsView: React.FC<ResultsViewProps> = ({ questions, userAnswers, onRet
             className="flex items-center gap-2 px-8 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:border-lib-500 hover:text-lib-600 hover:bg-lib-50 transition-colors w-full md:w-auto justify-center"
           >
             <Download size={20} />
-            Download Results
+            Download PDF
+          </button>
+
+          <button 
+            onClick={handleShare}
+            className="flex items-center gap-2 px-8 py-3 rounded-xl border-2 border-slate-200 text-slate-700 font-semibold hover:border-lib-500 hover:text-lib-600 hover:bg-lib-50 transition-colors w-full md:w-auto justify-center"
+          >
+            {isCopied ? <Check size={20} /> : <Share2 size={20} />}
+            {isCopied ? 'Copied!' : 'Share Result'}
           </button>
 
           <button 
